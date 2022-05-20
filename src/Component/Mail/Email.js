@@ -8,6 +8,9 @@ const Email = () => {
   const data = emails.map((email)=>{
     return (
       <EmailShow
+      key={email.emailId}
+      read={email.read}
+      emailId={email.emailId}
       email={email.email}
       emailAddress={email.emailAddress}
       />

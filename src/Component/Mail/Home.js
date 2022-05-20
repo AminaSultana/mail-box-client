@@ -1,13 +1,11 @@
 import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import classes from './Home.module.css'
-import { fetchEmailFromDB } from '../../store/email';
 import Email from './Email';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const Home = () => {
-   
-
+    const unreadEmail=useSelector(state=>state.email.unreadEmail)
     const navigate=useNavigate()
     const redirectToCompose=(e)=>{
         e.preventDefault()
@@ -18,6 +16,7 @@ const Home = () => {
         <div className={classes.home}>
             <section>
                 <button onClick={redirectToCompose}>Compose</button>
+                <p>Unread: {unreadEmail}</p>
             </section>
             <section>
                 <Email/>

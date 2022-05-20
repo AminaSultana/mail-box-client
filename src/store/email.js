@@ -2,7 +2,8 @@ import {createSlice} from "@reduxjs/toolkit"
 
 const userEmail=localStorage.getItem("email")
 const initialState = {
-    email: []
+    email: [],
+    unreadEmail:0,
 }
 
 const emailSlice = createSlice({
@@ -11,6 +12,12 @@ const emailSlice = createSlice({
     reducers:{
         getEmails(state,action){
             state.email=action.payload
+        },
+        unread(state){
+            state.unreadEmail = state.unreadEmail+1;
+        },
+        updateUnread(state){
+            state.unreadEmail = state.unreadEmail-1
         }
     }
 })
@@ -23,13 +30,14 @@ export const fetchEmailFromDB=()=>{
                 throw new Error("Could not fetch mail")
             }
             const email = await response.json()
-            console.log("iiiiii",email);
             if(email){
                 let emailData=[];
                 for(const key in email){
                     emailData.push({
+                        emailId:key,
                         email: email[key].email,
-                        emailAddress: email[key].emailAddress
+                        emailAddress: email[key].emailAddress,
+                        read: email[key].read
                     })
                 }
                 dispatch(emailActions.getEmails(emailData))
@@ -61,6 +69,28 @@ export const sendEmailToDB=(email)=>{
             sendRequest()
         } catch (error) {
             console.log("Error");
+        }
+    }
+}
+
+export const updateReadStatusToTrue=(email)=>{
+    return async(dispatch)=>{
+        const sendChangeRequest=async()=>{
+            const response= await fetch(`https://mail-box-client-e7133-default-rtdb.firebaseio.com/${userEmail}/${email.emailId}.json`, {
+                method: "PUT",
+                body: JSON.stringify(email),
+                headers: {
+                    "Content-Type": "application/json",
+                  },
+            })
+            if(!response.ok){
+                throw new Error("Could not send mail")
+            }
+        }
+        try {
+            sendChangeRequest()
+        } catch (error) {
+            console.log(error);
         }
     }
 }
